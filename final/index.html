@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Typing Speed Test - Login</title>
+  <style>
+    /* General Styling */
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      height: 100vh;
+      background: linear-gradient(45deg, #4b0082, #ffe5b4);
+      background-repeat: no-repeat;
+      background-size: cover;
+      color: white;
+      text-align: center;
+    }
+
+    h1, h2 {
+      font-weight: bold;
+    }
+
+    .container {
+      width: 50%;
+      margin: 50px auto;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 15px;
+      padding: 20px;
+      box-shadow: 0 8px 15px rgba(0, 0, 0, 0.3);
+    }
+
+    .login-options {
+      margin: 20px 0;
+    }
+
+    button {
+      padding: 12px 20px;
+      margin: 10px 5px;
+      background: #28a745;
+      border: none;
+      border-radius: 25px;
+      color: white;
+      font-size: 1em;
+      cursor: pointer;
+      transition: background-color 0.3s, transform 0.2s;
+    }
+
+    button:hover {
+      background: #218838;
+      transform: scale(1.05);
+    }
+
+    .login-form {
+      margin-top: 20px;
+      display: none;
+      background-color: rgba(255, 255, 255, 0.25);
+      border: 1px solid #ddd;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    input {
+      width: 90%;
+      padding: 12px;
+      margin: 10px 0;
+      border: none;
+      border-radius: 5px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    input:focus {
+      outline: none;
+      border: 1px solid #4b0082;
+    }
+
+    label {
+      font-size: 1.1em;
+    }
+
+    #errorMessage {
+      color: red;
+      margin-top: 10px;
+      min-height: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Typing warriors</h1>
+
+    <!-- Display Error Message -->
+    <div id="errorMessage"></div>
+
+    <div class="login-options">
+      <button onclick="loginUser()">Student Login</button>
+      <button onclick="showAdminForm()">Admin Login</button>
+    </div>
+
+    <!-- Admin Login Form -->
+    <div id="admin-login" class="login-form">
+      <h2>Admin Login</h2>
+      <form id="adminForm" onsubmit="return submitAdminForm(event)">
+        <label for="adminUsername">Username:</label><br>
+        <input type="text" name="adminUsername" id="adminUsername" placeholder="Enter your username" required><br>
+        <label for="adminPassword">Password:</label><br>
+        <input type="password" name="adminPassword" id="adminPassword" placeholder="Enter your password" required><br>
+        <button type="submit">Login</button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+   // Direct User Login to Registration Page
+function loginUser() {
+  window.location.href = 'registration.html';
+}
+
+// Show Admin Login Form and clear any previous data
+function showAdminForm() {
+  const adminForm = document.getElementById('admin-login');
+  adminForm.style.display = 'block';
+  document.getElementById('adminForm').reset(); // Clear form fields
+  document.getElementById('errorMessage').textContent = ''; // Clear error messages
+}
+
+// Submit Admin Form via AJAX
+function submitAdminForm(event) {
+  event.preventDefault();
+  
+  const form = event.target;
+  const formData = new FormData(form);
+  const errorMessage = document.getElementById('errorMessage');
+  
+  // Clear error message on new submission
+  errorMessage.textContent = '';
+  
+  // Show loading state (optional)
+  const submitBtn = form.querySelector('button[type="submit"]');
+  const originalBtnText = submitBtn.textContent;
+  submitBtn.textContent = 'Logging in...';
+  submitBtn.disabled = true;
+
+  fetch('login.php', {
+    method: 'POST',
+    body: formData
+  })
+  .then(response => {
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
+    return response.json();
+  })
+  .then(data => {
+    if (data.success) {
+      // Clear form before redirecting
+      form.reset();
+      window.location.href = 'admin1.html';
+    } else {
+      errorMessage.textContent = data.message || 'Invalid credentials';
+      // Clear password field only (keeps username for convenience)
+      document.getElementById('adminPassword').value = '';
+      // Or clear both fields:
+      // form.reset();
+    }
+  })
+  .catch(error => {
+    errorMessage.textContent = 'An error occurred. Please try again.';
+    console.error('Error:', error);
+    // Clear sensitive fields on error
+    document.getElementById('adminPassword').value = '';
+  })
+  .finally(() => {
+    // Restore button state
+    submitBtn.textContent = originalBtnText;
+    submitBtn.disabled = false;
+  });
+}
+
+// Disable navigation using Alt + Arrow keys
+document.addEventListener('keydown', function(event) {
+  if ((event.altKey && (event.key === 'ArrowLeft' || event.key === 'ArrowRight'))) {
+    event.preventDefault();
+    alert("Navigation using Alt + Arrow keys is disabled!");
+  }
+});
+
+// Clear form when clicking outside (optional)
+document.addEventListener('click', function(event) {
+  const adminForm = document.getElementById('admin-login');
+  const loginOptions = document.querySelector('.login-options');
+  
+  if (adminForm.style.display === 'block' && 
+      !adminForm.contains(event.target) && 
+      !loginOptions.contains(event.target)) {
+    adminForm.style.display = 'none';
+    document.getElementById('adminForm').reset();
+  }
+});
+  </script>
+</body>
+</html>

@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Registration Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            height: 100vh;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(45deg, #4b0082, #ffe5b4);
+            background-repeat: no-repeat;
+            background-size: cover;
+            color: #fff;
+            text-align: center;
+        }
+
+        .container {
+            max-width: 400px;
+            background-color: rgba(255, 255, 255, 0.2);
+            padding: 20px 30px;
+            margin: 50px auto;
+            border-radius: 10px;
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        h1 {
+            margin-bottom: 20px;
+            font-size: 2em;
+        }
+
+        label {
+            display: block;
+            text-align: left;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: none;
+            border-radius: 5px;
+            font-size: 1em;
+        }
+
+        input::placeholder, textarea::placeholder {
+            color: #aaa;
+        }
+
+        .btn {
+            background-color: #4b0082;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .btn:hover {
+            background-color: #8a2be2;
+        }
+        
+        .error-message {
+            color: #ff3333;
+            background-color: #ffeeee;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            display: none;
+        }
+    </style>
+    <script>
+        function validateMobile(input) {
+            input.value = input.value.toUpperCase().replace(/[^0-9]/g, '');
+            if (input.value.length > 10) {
+                input.value = input.value.slice(0, 10);
+            }
+        }
+
+        function validateForm(event) {
+            event.preventDefault();
+            
+            const mobile = document.getElementById('mobile').value;
+            if (!/^[0-9]{10}$/.test(mobile)) {
+                showError('Mobile number must be exactly 10 digits.');
+                return false;
+            }
+            
+            // Submit form via AJAX
+            submitForm();
+            return false;
+        }
+        
+        function showError(message) {
+            const errorDiv = document.getElementById('error-message');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+        }
+        
+        function submitForm() {
+            const form = document.querySelector('form');
+            const formData = new FormData(form);
+            
+            fetch('registration.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    window.location.href = 'typing-test.php?rollnumber=' + encodeURIComponent(data.rollnumber);
+                } else {
+                    showError(data.message);
+                }
+            })
+            .catch(error => {
+                showError('An error occurred. Please try again.');
+            });
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h1>Registration Form</h1>
+        <div id="error-message" class="error-message"></div>
+        <form method="POST" action="registration.php" autocomplete="off" onsubmit="return validateForm(event)">
+            <label for="name">Name:</label>
+            <input type="text" id="name" name="name" placeholder="Enter your name" required>
+
+            <label for="rollnumber">Roll Number:</label>
+            <input type="text" id="rollnumber" name="rollnumber" placeholder="Enter your roll number" required>
+
+            <label for="mobile">Mobile Number:</label>
+            <input type="text" id="mobile" name="mobile" placeholder="Enter your 10-digit mobile number" maxlength="10" oninput="validateMobile(this)" required>
+
+            <label for="department">Department:</label>
+            <select id="department" name="department" required>
+                <option value="">Select your department</option>
+                <option value="CSE">CSE</option>
+                <option value="AI">AI</option>
+                <option value="DS">DS</option>
+                <option value="AI&DS">AI&DS</option>
+                <option value="AI&ML">AI&ML</option>
+                <option value="ECE">ECE</option>
+                <option value="EEE">EEE</option>
+                <option value="ME">ME</option>
+                <option value="CE">CE</option>
+            </select>
+
+            <label for="college">College Name:</label>
+            <input type="text" id="college" name="college" placeholder="Enter your college name" required>
+
+            <label for="address">Address:</label>
+            <textarea id="address" name="address" placeholder="Enter your address" rows="4" required></textarea>
+
+            <button type="reset" class="btn">Reset</button>
+            <button type="submit" class="btn">Submit</button>
+        </form>
+    </div>
+</body>
+</html>

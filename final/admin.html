@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin - Registration Table</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f9f9f9;
+      margin: 40px;
+    }
+    h1 {
+      color: #333;
+      text-align: center;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      background-color: #fff;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 12px;
+      text-align: center;
+    }
+    th {
+      background-color: #4CAF50;
+      color: white;
+    }
+    tr:nth-child(even) {
+      background-color: #f2f2f2;
+    }
+    tr:hover {
+      background-color: #ddd;
+    }
+  </style>
+</head>
+<body>
+ <h1>Registration Table</h1>
+ <table id="registrationTable">
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Name</th>
+      <th>Roll Number</th>
+      <th>Department</th>
+      <th>College</th>
+      <th>Mobile Number</th>
+      <th>Address</th>
+      <th>Total Words</th>
+      <th>Correct Words</th>
+      <th>Wrong Words</th>
+      <th>WPM</th>
+      <th>Accuracy (%)</th>
+    </tr>
+  </thead>
+  <tbody id="tableBody"></tbody>
+</table>
+
+  <script>
+    async function fetchData() {
+  try {
+    const response = await fetch('admin.php');
+    if (!response.ok) {
+      throw new Error('Network error');
+    }
+
+    const result = await response.json();
+    
+    const tableBody = document.getElementById('tableBody');
+
+    tableBody.innerHTML = '';
+
+    // Display registration data
+    if (result.data && !result.data.error) {
+      result.data.forEach(row => {
+        const tableRow = document.createElement('tr');
+        tableRow.innerHTML = `
+          <td>${row.id}</td>
+          <td>${row.name}</td>
+          <td>${row.roll_number}</td>
+          <td>${row.department}</td>
+          <td>${row.college}</td>
+          <td>${row.mobile_number ?? 'N/A'}</td>
+          <td>${row.address ?? 'N/A'}</td>
+          <td>${row.total_words ?? 'N/A'}</td>
+          <td>${row.correct_words ?? 'N/A'}</td>
+          <td>${row.wrong_words ?? 'N/A'}</td>
+          <td>${row.wpm ?? 'N/A'}</td>
+          <td>${row.accuracy ?? 'N/A'}</td>
+        `;
+        tableBody.appendChild(tableRow);
+      });
+    } else {
+      tableBody.innerHTML = `<tr><td colspan="12">${result.data.error || 'No registration data available'}</td></tr>`;
+    }
+  } catch (error) {
+    console.error('Error:', error);
+  }
+}
+
+fetchData();
+
+  </script>
+</body>
+</html>

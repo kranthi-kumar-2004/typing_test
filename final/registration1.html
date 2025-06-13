@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Registration Form</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        height: 100vh;
+        margin: 0;
+        padding: 0;
+        background: linear-gradient(45deg, #4b0082, #ffe5b4);
+        background-repeat: no-repeat;
+        background-size: cover;
+        color: #fff;
+        text-align: center;
+      }
+
+      .container {
+        max-width: 400px;
+        background-color: rgba(255, 255, 255, 0.2);
+        padding: 20px 30px 20px 20px;
+        margin: 50px auto;
+        border-radius: 10px;
+        box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+      }
+
+      h1 {
+        margin-bottom: 20px;
+        font-size: 2em;
+      }
+
+      label {
+        display: block;
+        text-align: left;
+        margin-bottom: 5px;
+        font-weight: bold;
+      }
+
+      input {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 20px;
+        border: none;
+        border-radius: 5px;
+        font-size: 1em;
+      }
+
+      input::placeholder {
+        color: #aaa;
+      }
+
+      .btn {
+        background-color: #4b0082;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        font-size: 1em;
+        cursor: pointer;
+        transition: background-color 0.3s;
+      }
+
+      .btn:hover {
+        background-color: #8a2be2;
+      }
+
+      .back-btn {
+        position: absolute;
+        top: 20px;
+        left: 20px;
+        background-color: #8a2be2;
+        color: white;
+        padding: 10px 15px;
+        border: none;
+        border-radius: 5px;
+        font-size: 1em;
+        cursor: pointer;
+        text-decoration: none;
+      }
+
+      .back-btn:hover {
+        background-color: #4b0082;
+      }
+
+      #errorMessage {
+        color: #ff3333;
+        background-color: #ffeeee;
+        padding: 10px;
+        border-radius: 5px;
+        margin-bottom: 20px;
+        display: none;
+      }
+    </style>
+</head>
+<body>
+   
+    <h1>Registration Form</h1>
+    <div class="container">
+      <div id="errorMessage"></div>
+      <form id="registrationForm">
+        <label for="rollnumber">Roll Number:</label>
+        <input type="text" id="rollnumber" name="rollnumber" placeholder="Enter your roll number" required>
+        
+        <button class="btn" type="submit">Register</button>
+      </form>
+    </div>
+
+    <script>
+      document.getElementById('registrationForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const rollnumber = document.getElementById('rollnumber').value;
+        const errorDiv = document.getElementById('errorMessage');
+        
+        // Clear previous error
+        errorDiv.style.display = 'none';
+        
+        fetch('register.php', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: 'rollnumber=' + encodeURIComponent(rollnumber)
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            window.location.href = 'registration1.html';
+          } else {
+            errorDiv.textContent = data.message;
+            errorDiv.style.display = 'block';
+          }
+        })
+        .catch(error => {
+          errorDiv.textContent = 'An error occurred. Please try again.';
+          errorDiv.style.display = 'block';
+        });
+      });
+    </script>
+</body>
+</html>

@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Typing Test</title>
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #74b9ff, #0984e3);
+      margin: 0;
+      padding: 20px;
+      text-align: center;
+      color: #fff;
+    }
+    h1 {
+      font-size: 3rem;
+      margin-bottom: 10px;
+    }
+    #rollNumberDisplay {
+      font-size: 1.2rem;
+      color: #dfe6e9;
+      margin-bottom: 20px;
+    }
+    #timer {
+      font-size: 1.5rem;
+      color: #fff;
+      margin-bottom: 20px;
+    }
+    .container {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      margin-top: 30px;
+    }
+    .box {
+      width: 45%;
+      background-color: #fff;
+      border-radius: 12px;
+      padding: 20px;
+      height: 400px;
+      overflow-y: auto;
+      font-size: 16px;
+      line-height: 1.6;
+      color: #2d3436;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+    }
+    .correct {
+      color: #00b894;
+    }
+    .incorrect {
+      color: #d63031;
+    }
+    textarea {
+      width: 100%;
+      height: 100%;
+      border: none;
+      outline: none;
+      resize: none;
+      font-size: 16px;
+      line-height: 1.6;
+      color: #2d3436;
+    }
+    #resultPopup {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background-color: rgba(0, 0, 0, 0.9);
+      color: white;
+      padding: 40px;
+      border-radius: 20px;
+      z-index: 9999;
+      display: none;
+      font-size: 24px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+      text-align: center;
+    }
+ #capsPopup {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      background-color: red;
+      color: white;
+      text-align: center;
+      padding: 10px;
+      font-size: 16px;
+      z-index: 1000;
+    }
+
+  </style>
+</head>
+<body>
+  <h1>Typing warriors</h1>
+  <p id="rollNumberDisplay"></p>
+  <p id="timer">Time Left: 60s</p>
+    <div id="capsPopup">⚠ Warning: Caps Lock is ON!</div>
+  <div class="container">
+    <div class="box" style="user-select: none; pointer-events: none;">
+      <p id="paragraph">Progress shapes our lives in countless ways. Technological advancements have brought remarkable conveniences, but they also present significant challenges. Artificial intelligence has automated many industries,increasing efficiency and reducing costs. However,this automation raises concerns about job displacement. Many workers fear that machines may replace their roles,leading to unemployment and financial uncertainty.Similarly,privacy concerns grow as companies gather massive amounts of personal data. Ethical questions arise about how this data is used and protecting individual privacy becomes more important than ever. Scientific exploration has also contributed to progress.Breakthroughs in medicine have extended life expectancy and improved quality of life. Vaccines and advanced treatments have eradicated diseases that once claimed countless lives. Genetic engineering offers the possibility of eliminating hereditary illnesses. Yet,it also opens the door to genetic modifications with unknown consequences. Balancing these innovations with ethical considerations is essential to ensure responsible scientific progress. Furthermore, environmental concerns remain a critical aspect of progress. Industrial growth often comes at the cost of natural resources. Deforestation, pollution and climate change are direct results of human activity. Sustainable practices are necessary to preserve the planet for future generations. Renewable energy sources like solar, wind and hydropower present alternatives to fossil fuels. By embracing these clean energy options, societies can reduce their carbon footprint and mitigate environmental damage.Education and social progress also play vital roles in shaping our world.Access to quality education empowers individuals and fosters innovation.However,educational inequality remains a significant barrier.In many regions,children lack access to basic schooling,limiting their opportunities for growth.Bridging this gap through inclusive education policies is essential for societal advancement. Additionally, promoting gender equality and supporting underrepresented communities ensures that progress benefits everyone. Cultural perspectives also influence how societies define progress. While some view economic growth and technological sophistication as markers of advancement, others prioritize well-being, social equity and environmental stewardship. Recognizing and respecting these diverse view point helps create a more inclusive and balanced vision of progress. Ultimately, the concept of progress is complex and multifaceted. It requires careful consideration of both its benefits and its consequences. By fostering innovation while maintaining ethical responsibility, societies can achieve sustainable progress. Interdisciplinary collaboration and open dialogue are essential for navigating the challenges of modern advancement. As we continue to explore new frontiers, the resilience of our ethical compass and the inclusivity of our goals will determine the legacy of human progress. </p>
+    </div>
+
+    <div class="box">
+      <textarea id="typingArea" placeholder="Start typing here..." onpaste="return false;" onkeyup="checkCapsLock(event)"></textarea>
+    </div>
+  </div>
+
+  <div id="resultPopup"></div>
+
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const rollNumber = urlParams.get('rollnumber');
+    document.getElementById('rollNumberDisplay').textContent = `Roll Number: ${rollNumber}`;
+let timeLeft = 180; // Changed from 60 to 180 (3 minutes)
+const timerElement = document.getElementById('timer');
+const typingArea = document.getElementById('typingArea');
+const paragraph = document.getElementById('paragraph');
+let originalWords = paragraph.innerText.trim().split(/\s+/);
+let timerStarted = false;
+let timerInterval;
+
+function updateTimer() {
+  if (timeLeft > 0) {
+    timeLeft--;
+    const minutes = Math.floor(timeLeft / 60);
+    const seconds = timeLeft % 60;
+    timerElement.textContent = `Time Left: ${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+  } else {
+    clearInterval(timerInterval);
+    typingArea.disabled = true;
+    calculateResults();
+  }
+}
+
+function scrollUp() {
+  const completedWords = typingArea.value.trim().split(/\s+/).length;
+  const linesToScroll = Math.floor(completedWords / 30);
+  paragraph.style.transform = `translateY(-${linesToScroll * 35}px)`;
+}
+
+let backspaceCount = 0;
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Backspace') {
+    backspaceCount++;
+  }
+});
+
+function calculateResults() {
+  const typedText = typingArea.value.trim();
+  const typedWords = typedText.split(/\s+/);
+  let correctWords = 0;
+  let wrongWords = 0;
+  let completedWords = 0;
+
+  const lastChar = typingArea.value.slice(-1);
+  const isLastWordComplete = lastChar === ' ';
+
+  typedWords.forEach((word, index) => {
+    if (index < originalWords.length) {
+      completedWords++;
+      if (word === originalWords[index]) {
+        correctWords++;
+      } else {
+        wrongWords++;
+      }
+    }
+  });
+
+  if (!isLastWordComplete && typedWords.length > 0) {
+    completedWords--;
+    if (typedWords[typedWords.length - 1] === originalWords[typedWords.length - 1]) {
+      correctWords--;
+    } else {
+      wrongWords--;
+    }
+  }
+
+  const finalWPM = Math.round((correctWords) / 3); // Calculate WPM for 3 minutes
+  let finalAccuracy = completedWords > 0 ? (correctWords / completedWords) * 100 : 0.0;
+  finalAccuracy -= backspaceCount * 0.2;
+  finalAccuracy = Math.max(finalAccuracy, 0);
+
+  sendResults(correctWords + wrongWords, correctWords, wrongWords, finalWPM, finalAccuracy);
+  const resultMessage = `WPM: ${finalWPM}\nAccuracy: ${finalAccuracy.toFixed(2)}%`;
+  showPopup(resultMessage);
+}
+
+function sendResults(totalWords, correctWords, wrongWords, wpm, accuracy) {
+  fetch('rollnumber.php', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      rollnumber: rollNumber,
+      totalWords,
+      correctWords,
+      wrongWords,
+      wpm,
+      accuracy
+    })
+  }).catch(error => console.error('Error:', error));
+}
+
+
+    function showPopup(message) {
+      const popup = document.getElementById('resultPopup');
+      popup.innerText = message;
+      popup.style.display = 'block';
+       setTimeout(() => {
+        window.location.href = 'index.html';
+      }, 15000);
+    }
+
+    typingArea.addEventListener('input', () => {
+      if (!timerStarted) {
+        timerStarted = true;
+        timerInterval = setInterval(updateTimer, 1000);
+      }
+
+      const typedWords = typingArea.value.trim().split(/\s+/);
+      paragraph.innerHTML = originalWords.map((word, index) => {
+        if (typedWords[index] === undefined) {
+          return `<span>${word}</span>`;
+        }
+        return typedWords[index] === word
+          ? `<span class='correct'>${word}</span>`
+          : `<span class='incorrect'>${word}</span>`;
+      }).join(' ');
+
+      scrollUp();
+    });
+
+    document.addEventListener('keydown', function (e) {
+      if ((e.key === 'F5') || (e.ctrlKey && e.key === 'r')) {
+        e.preventDefault();
+        console.log('Reload is blocked!');
+      }
+    });
+function checkCapsLock(event) {
+      const popup = document.getElementById("capsPopup");
+      if (event.getModifierState("CapsLock")) {
+        popup.style.display = "block";
+      } else {
+        popup.style.display = "none";
+      }
+    }
+document.addEventListener('keydown', function(event) {
+  if ((event.altKey && event.key === 'ArrowLeft') || (event.altKey && event.key === 'ArrowRight')) {
+    event.preventDefault();
+    alert("Navigation using Alt + Arrow keys is disabled!");
+  }
+});
+  </script>
+</body>
+</html>
