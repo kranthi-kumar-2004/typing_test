@@ -6,8 +6,8 @@ ini_set('display_errors', 1);
 // Database connection
 $servername = "localhost";
 $username = "root";
-$password = "Kranthi123@";
-$dbname = "typingtest";
+$password = "password";
+$dbname = "dbname";
 
 $conn = new mysqli($servername, $username, $password, $dbname);
 
